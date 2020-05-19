@@ -1,0 +1,7 @@
+.icon_wallet {
+  -ms-transform: rotate(-30deg);
+  /* IE 9 */
+  -webkit-transform: rotate(-30deg);
+  /* Safari 3-8 */
+  transform: rotate(-30deg);
+}
