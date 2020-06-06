@@ -14,7 +14,8 @@
         $this->load->helper('text');
 				$table = 'data_berita as a';
 				$this->db->from($table);
-        $this->db->where('a.is_deleted', '0');
+				$this->db->where('a.is_deleted', '0');
+				$this->db->order_by("a.prioritas", "ASC");
         $list = $this->db->get()->result_array();
       ?>
 				<?php foreach ($list as $ls) : ?>
