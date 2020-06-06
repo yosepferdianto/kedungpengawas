@@ -135,6 +135,10 @@
       padding: 5px;
     }
 
+    .card-textarea {
+      border: 1px solid #ddd;
+    }
+
     hr.style1 {
 			border-top: 1px solid #ddd;
       margin: 8px 0px;
