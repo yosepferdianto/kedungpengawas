@@ -7,6 +7,8 @@ class Berita extends CI_Controller {
     parent::__construct();
     // $this->load->library('datatables');
     $this->load->model('Data_berita_model', 'data_berita');
+    $this->load->library('form_validation', 'session');
+    $this->load->helper('url');
     $this->load->helper('tgl_indo');
     if (!$this->session->userdata('staff_desa_in')) {
       redirect('/staffadmin', 'refresh');
@@ -71,6 +73,70 @@ class Berita extends CI_Controller {
 		} else {
       redirect('/staffadmin');
     }
+  }
+
+  public function tambahberita() {
+    $status   = FALSE;
+    $msg     = "(EXP)";
+
+    $idAdmin = $this->session->userdata('id_akun_admin');
+
+    $cekPrioritas = $this->data_berita->cek_prioritas();
+    $prioritas  = $cekPrioritas + 1;
+
+    $judul      = $this->input->post('judul');
+    $sub_judul  = $this->input->post('sub_judul');
+    $isi_berita  = $this->input->post('isi_berita');
+
+    $url = $this->config->item('upload_url') . "./storage/upload/berita/";
+    $rawFileName = $_FILES['file']['name'];
+    $fileName = str_replace(' ', '-', $rawFileName);
+    $formatfile	= date('YmdHis') . $fileName;
+    if (!empty($rawFileName)){
+      $pathfileName	= $url . date('YmdHis') . $fileName;
+    } else {
+      $pathfileName	= "./storage/img/noimage.png";
+    }
+    $directory = $this->config->item('upload_destination') .  "./storage/upload/berita/";
+
+    if ($this->session->userdata('staff_desa_in') == "") {
+      $status = FALSE;
+      $msg   = "error_login_session";
+    } else if (empty($idAdmin)) {
+      $status = FALSE;
+      $msg   = "id_admin_null";
+    } else if (empty($judul)) {
+      $status = FALSE;
+      $msg   = "judul_null";
+    } else if (empty($sub_judul)) {
+      $status = FALSE;
+      $msg   = "sub_judul_null";
+		} else if (empty($isi_berita)) {
+      $status = FALSE;
+      $msg   = "isi_berita_null";
+    } else {
+
+      $dataBerita = [
+        'id_akun_admin'   => $idAdmin,
+        'prioritas'       => $prioritas,
+        'judul_berita'    => $judul,
+        'sub_judul'       => $sub_judul,
+        'isi_berita'      => $isi_berita, 
+        'foto'            => $pathfileName,
+        'is_deleted'      => '0',
+      ];
+      
+      if (empty($dataBerita)) {
+				$status = FALSE;
+				$msg 	= "error_input_array";
+			} else {
+        move_uploaded_file($_FILES["file"]["tmp_name"], trim($directory . $formatfile));
+        $this->data_berita->save($dataBerita);
+        $status = TRUE;
+        $msg   = "Proses membuat berita berhasil";
+			}
+    }
+    echo json_encode(array('status' => $status, 'message' => $msg));
   }
 
 }

@@ -89,6 +89,32 @@ class Data_berita_model extends CI_Model
     $this->_get_datatables_query();
     return $this->db->count_all_results();
   }
+
+  public function cek_prioritas()
+  {
+    $this->db->select('a.prioritas');
+    $this->db->from($this->table);
+    $this->db->order_by("a.prioritas", "DESC");
+    $this->db->limit(1);
+    $query = $this->db->get();
+    $X = $query->num_rows();
+    if($X == null){
+      return '0';
+    } else {
+      return $query->row()->prioritas;
+    }
+  }
+
+  public function save($data)
+  {
+    $this->db->set('id_berita', 'UUID()', FALSE);
+    $this->db->set('created_at', 'NOW()', FALSE);
+    $this->db->set('updated_at', 'NOW()', FALSE);
+    
+    $this->db->insert('data_berita', $data);
+    return $this->db->insert_id();
+  }
+
   
   // ACTIONS MODEL
 
