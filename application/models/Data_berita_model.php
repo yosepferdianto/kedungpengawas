@@ -92,8 +92,9 @@ class Data_berita_model extends CI_Model
 
   public function cek_prioritas()
   {
-    $this->db->select('a.prioritas');
+    $this->db->select('*');
     $this->db->from($this->table);
+    $this->db->where('a.created_at BETWEEN DATE_SUB(NOW(), INTERVAL 1 DAY) AND NOW()');
     $this->db->order_by("a.prioritas", "DESC");
     $this->db->limit(1);
     $query = $this->db->get();
