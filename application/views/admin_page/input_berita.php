@@ -54,7 +54,7 @@
 												<input type="text" class="form-control" id="text_file" disabled placeholder="Upload Gambar"
 													style="display:none">
 												<span class="input-group-btn" id="btn_batal_upload" style="display:none">
-													<button class="re_input btn btn-defautl btn-flat text-red" title="Batal" type="button"><i
+													<button class="btn btn-defautl btn-flat text-red" title="Batal" type="button" onclick="re_input_img()"><i
 															class="fa fa-times"></i></button>
 												</span>
 											</div>
@@ -104,7 +104,7 @@
 	});
 	$(document).on('change', '.file', function () {
 		$(this).parent().find('#text_file').val($(this).val().replace(/C:\\fakepath\\/i, ''));
-		if ($('input[name="img[]"]').val() !== '') {
+		if ($('input[name="file"]').val() !== '') {
 			$('#text_file').show();
 			$('#btn_batal_upload').show();
 			$('#show_img').attr('src', '');
@@ -114,11 +114,17 @@
 		}
 	});
 
-	$(document).on('click', '.re_input', function () {
-		$('input[name="img[]"]').val('');
+	// $(document).on('click', '.re_input', function () {
+	// 	$('input[name="file"]').val('');
+	// 	$('#text_file').hide();
+	// 	$('#btn_batal_upload').hide();
+	// });
+
+	function re_input_img() {
+		$('input[name="file"]').val();
 		$('#text_file').hide();
 		$('#btn_batal_upload').hide();
-	});
+	}
 
 	function tambahberita() {
 		$('#btn_kirim').html('<i class="fas fa-spinner fa-pulse"></i> <b>Kirim Berita</b>'); //change button text
@@ -146,7 +152,8 @@
 						$('.modal_action_status').text(data.message);
 						$('#modal_form_sukses').modal('show');
 						$('#form')[0].reset();
-						CKEDITOR.instances.editor1.setData("")
+						CKEDITOR.instances.editor1.setData("");
+						re_input_img();
 					} else {
 						console.log(data.message);
 						$('.alert').show();
@@ -188,6 +195,9 @@
 					$('#btn_kirim').attr('disabled', false); //set button disable
 					$('.modal_action_quest').html('Apakah berita yang anda tulis sudah benar?');
 					re_validation();
+					$('#form')[0].reset();
+					CKEDITOR.instances.editor1.setData("");
+					re_input_img();
 				}
 		});
 	}

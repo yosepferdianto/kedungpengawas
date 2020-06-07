@@ -15,6 +15,7 @@
 				$table = 'data_berita as a';
 				$this->db->from($table);
 				$this->db->where('a.is_deleted', '0');
+				$this->db->order_by('a.created_at', 'DESC');
 				$this->db->order_by("a.prioritas", "ASC");
         $list = $this->db->get()->result_array();
       ?>
