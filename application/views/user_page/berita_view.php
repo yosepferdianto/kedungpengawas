@@ -31,7 +31,7 @@
                 <p><?= longdate_indo($tanggal) ?></p>
                 <h3 class="box-title text-bold" style="line-height: 10px;"><?= ucwords($ls['judul_berita']); ?></h3>
                 <h4 class="text-bold" style="line-height: 20px;"><?= character_limiter($ls['sub_judul'], 20); ?></h4>
-                <?= character_limiter($ls['isi_berita'], 60) ?>
+                <h6><?= strip_tags(character_limiter($ls['isi_berita'], 60)) ?></h6>
               </div>
             </div>
 
