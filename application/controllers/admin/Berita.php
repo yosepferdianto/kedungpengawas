@@ -199,9 +199,6 @@ class Berita extends CI_Controller {
 
     $idAdmin = $this->session->userdata('id_akun_admin');
 
-    $cekPrioritas = $this->data_berita->cek_prioritas();
-    $prioritas  = $cekPrioritas + 1;
-
     $id_berita   = $this->input->post_get('idBerita');
     $judul      = $this->input->post_get('judul');
     $sub_judul  = $this->input->post_get('sub_judul');
@@ -238,7 +235,6 @@ class Berita extends CI_Controller {
 
       $dataBerita = [
         'id_akun_admin'   => $idAdmin,
-        'prioritas'       => $prioritas,
         'judul_berita'    => $judul,
         'sub_judul'       => $sub_judul,
         'isi_berita'      => $isi_berita, 
