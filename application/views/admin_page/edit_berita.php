@@ -195,7 +195,7 @@
 						$('#img_cover_berita').html('<img src="'+set_img+'">');
 						$('#set_img').val(url_img);
 					} else {
-						$('#header_msg_failed').html('<i class="fa fa-exclamation-triangle"></i> Tidak bisa membuka informasi detail pengajuan!');
+						$('#header_msg_failed').html('<i class="fa fa-exclamation-triangle"></i> Tidak bisa membuka informasi data berita!');
 						$('#body_msg_failed').html(data.message);
 						$('#modal_form_failed').modal('show');
 					}
@@ -203,7 +203,7 @@
 				
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				$('#header_msg_failed').html('<i class="fa fa-exclamation-triangle"></i> Tidak bisa membuka informasi detail pengajuan!');
+				$('#header_msg_failed').html('<i class="fa fa-exclamation-triangle"></i> Tidak bisa membuka informasi data berita!');
 				$('#body_msg_failed').html('Mohon ulangi beberapa saat lagi');
 				$('#modal_form_failed').modal('show');
 				// window.open("<?= base_url('/admin/berita') ?>", '_self');
@@ -322,7 +322,7 @@
 				<!-- <button type="button" data-dismiss="modal"></button> -->
 				<div class="text-center">
 					<i class="far fa-check-circle fa-10x"></i>
-					<h4 class="modal_action_status"></h4>
+					<h3 class="modal_action_status text-bold"></h3>
 					<button type="button" class="btn btn-outline" data-dismiss="modal">Oke</button>
 				</div>
 
@@ -363,12 +363,9 @@
 </div>
 <!-- End Modal FAILED -->
 
-<!-- Modal SUCCESS -->
-<div class="modal fade" id="modal_form_waiting" role="dialog"  style="background-color: rgba(0,0,0,0.0); color: white; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+<!-- Modal Waiting -->
+<div class="modal" id="modal_form_waiting" role="dialog"  style="background-color: rgba(0,0,0,0.0); color: white; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
 	<div class="modal-dialog modal-sm">
-		<!-- <div class="modal-content"> -->
-			<!-- <div class="modal-header center"> -->
-				<!-- <button type="button" data-dismiss="modal"></button> -->
 				<div class="text-center">
 					<i class="fas fa-spinner fa-pulse fa-7x"></i>
 					<h4>Memuat...</h4>
@@ -377,4 +374,4 @@
 		<!-- </div> -->
 	</div>
 </div>
-<!-- End Modal SUCCESS -->
+<!-- End Modal Waiting -->

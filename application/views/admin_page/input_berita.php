@@ -249,7 +249,7 @@
 				<!-- <button type="button" data-dismiss="modal"></button> -->
 				<div class="text-center">
 					<i class="far fa-check-circle fa-10x"></i>
-					<h4 class="modal_action_status"></h4>
+					<h3 class="modal_action_status text-bold"></h3>
 					<button type="button" class="btn btn-outline" data-dismiss="modal">Oke</button>
 				</div>
 
