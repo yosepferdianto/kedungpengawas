@@ -8,6 +8,7 @@ class Berita extends CI_Controller {
     // $this->load->library('datatables');
     $this->load->model('Data_berita_model', 'data_berita');
     $this->load->library('form_validation', 'session');
+    $this->load->helper('text');
     $this->load->helper('url');
     $this->load->helper('tgl_indo');
     if (!$this->session->userdata('staff_desa_in')) {
@@ -38,17 +39,24 @@ class Berita extends CI_Controller {
 
       $tanggal = date("Y-m-d", strtotime($ls->created_at));
       $waktu = date("H:i", strtotime($ls->created_at));
+      $tanggal_ = date("Y-m-d", strtotime($ls->updated_at));
+      $waktu_ = date("H:i", strtotime($ls->updated_at));
 
-      $row[]   = '<h3 class="text-bold text-blue"># '.$ls->prioritas.'</h3>';
+      // $row[]   = '<h3 class="text-bold text-blue"># '.$ls->prioritas.'</h3>';
       $row[]   = '<b>'.$ls->judul_berita.'</b><br><small>'.$ls->sub_judul.'</small><br><hr class="style1">
       <a class="btn btn-sm btn-primary pull-right" title="Lihat" onclick="lihatBerita(' . "'" . $ls->id_berita . "'" . ')"><i class="fa fa-info-circle"></i> Lihat Berita</a>';
-      $row[]   = $ls->isi_berita;
+      $row[]   = strip_tags(character_limiter($ls->isi_berita, 200));
       $row[]   = ' <div class="card-image-table"><img src="'.base_url($ls->foto).'" alt=""></div>';
-      $row[]   = longdate_indo($tanggal).'<br>'.$waktu.' WIB<hr class="style1-ms-0">'.'Pembuat : @'.$ls->username.'<br>('.$ls->nama_lengkap.')';
+
+      if ($ls->created_at === $ls->updated_at){
+        $row[]   = '<b class="text-blue">Dibuat :<br>'.longdate_indo($tanggal).'<br>'.$waktu.' WIB</b>'.'<hr class="style1-ms-0">'.'Penulis : @'.$ls->username.'<br>('.$ls->nama_lengkap.')';
+      } else {
+        $row[]   = '<b class="text-blue">Diperbarui :<br>'.longdate_indo($tanggal_).'<br>'.$waktu_.' WIB</b>'.'<hr class="style1-ms-0">'.'Penulis : @'.$ls->username.'<br>('.$ls->nama_lengkap.')';
+      }
       //add html for action
       $row[] = '<div class="text-center">
         <a class="btn btn-primary btn-sm" title="Ubah" href="'.base_url('admin/berita/ubah_berita/'.$ls->id_berita).'"><i class="fa fa-edit"></i> Ubah</a>
-        <a class="btn btn-default btn-sm text-red" title="Hapus" onclick="hapus(' . "'" . $ls->id_berita . "'" . ')"><i class="fa fa-trash"></i> Hapus</a>
+        <a class="btn btn-default btn-sm text-red" title="Hapus" onclick="pre_delete(' . "'" . $ls->id_berita . "'" . ')"><i class="fa fa-trash"></i> Hapus</a>
       </div>';
 
       $data[] = $row;
@@ -133,7 +141,7 @@ class Berita extends CI_Controller {
         move_uploaded_file($_FILES["file"]["tmp_name"], trim($directory . $formatfile));
         $this->data_berita->save($dataBerita);
         $status = TRUE;
-        $msg   = "Proses membuat berita berhasil";
+        $msg   = "Berhasil Buat Berita";
 			}
     }
     echo json_encode(array('status' => $status, 'message' => $msg));
@@ -248,10 +256,37 @@ class Berita extends CI_Controller {
         move_uploaded_file($_FILES["file"]["tmp_name"], trim($directory . $formatfile));
         $this->data_berita->update_berita(['id_berita' => $id_berita], $dataBerita);
         $status = TRUE;
-        $msg   = "Proses mengubah berita berhasil";
+        $msg   = "Berhasil Ubah Berita ";
 			}
     }
     echo json_encode(array('status' => $status, 'message' => $msg));
+  }
+
+  public function hapusberita()
+  {
+    $status = FALSE;
+    $msg    = "Proses hapus tidak bisa!";
+
+    $id_berita = $this->input->post_get('id_berita');
+    
+    if (!empty($id_berita)) {
+      $dataSave = [
+        'prioritas'   => '',
+        'is_deleted'  => '1',
+      ];
+
+      $status = TRUE;
+      $msg   = "Berhasil Hapus Berita";
+
+      $this->data_berita->update_berita(['id_berita' => $id_berita], $dataSave);
+
+    } else {
+      $status = FALSE;
+      $msg    = "ID Berita tidak ada, mohon ulangi kembali!";
+    }
+    
+    echo json_encode(array("status" => $status, 'message' => $msg));
+
   }
 
 }
