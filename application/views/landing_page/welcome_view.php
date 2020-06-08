@@ -72,7 +72,7 @@
 										<p>'.longdate_indo($tanggal).'</p>
 										<h3 class="box-title text-bold" style="line-height: 10px;">'.ucwords($ls['judul_berita']).'</h3>
 										<h4 class="box-title text-bold" style="line-height: 20px;">'.character_limiter($ls['sub_judul'], 20).'</h4>
-										<p>'.character_limiter($ls['isi_berita'], 100).'</p>
+										<p>'. strip_tags(character_limiter($ls['isi_berita'], 95)) .'</p>
 			
 										<a href="'. base_url('berita/detail/'.$ls['id_berita']).'" class="btn btn-success btn-block"
 											role="button">Baca selengkapnya <i class="fa fa-arrow-circle-right"></i></a>
@@ -128,7 +128,7 @@
 							<p><?= longdate_indo($tanggal) ?></p>
 							<h3 class="box-title text-bold" style="line-height: 10px;"><?= ucwords($ls['judul_berita']); ?></h3>
 							<h4 class="box-title text-bold" style="line-height: 20px;"><?= character_limiter($ls['sub_judul'], 20) ?></h4>
-							<p><?= character_limiter($ls['isi_berita'], 100) ?></p>
+							<p><?= strip_tags(character_limiter($ls['isi_berita'], 95)) ?></p>
 
 							<a href="<?= base_url('berita/detail/'.$ls['id_berita']); ?>" class="btn btn-success btn-block"	role="button">Baca selengkapnya <i class="fa fa-arrow-circle-right"></i></a>
 						</div>
@@ -155,7 +155,11 @@
 		$('#kecilkan').on('click', function () {
 			$('#semua_berita').hide();
 			$('#hot_berita').show();
-		})
+		});
+
+		// var htmlString = $('.sorot').val();
+		// var stripedHtml = htmlString.replace(/<[^>]+>/g, '');
+		// $('.str_sorot').html(stripedHtml);
 	});
 
 </script>
