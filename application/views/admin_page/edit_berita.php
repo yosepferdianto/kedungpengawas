@@ -113,6 +113,7 @@
 		CKEDITOR.replace('editor1'); // Use textarea CKEDITOR
 		// load data berita
 		var idBerita = $('#idBerita').val();
+		$('#modal_form_waiting').modal('show');
 		loadData(idBerita);
 		re_validation(); // reset form validasi
 
@@ -173,7 +174,6 @@
 	}
 
 	function loadData(id) { 
-		$('#modal_form_waiting').modal('show');
 		$.ajax({
 			url: "<?php echo site_url('admin/berita/load_data_berita/') ?>" + id,
 			type: "POST",
