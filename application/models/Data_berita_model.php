@@ -7,7 +7,7 @@ class Data_berita_model extends CI_Model
   var $table        = 'data_berita as a';
   var $akun_admin   = 'data_akun_admin as b';
 
-  var $column_order = array('a.prioritas', 'a.judul_berita', 'a.isi_berita', null, 'a.created_at', null);
+  var $column_order = array('a.prioritas', 'a.judul_berita', 'a.isi_berita', null, 'date(a.created_at)', null);
 
   var $column_search = array('a.prioritas', 'a.created_at', 'a.judul_berita', 'a.sub_judul', 'a.isi_berita', 'b.nama_lengkap', 'b.username');
 
@@ -37,6 +37,8 @@ class Data_berita_model extends CI_Model
     $this->db->from($this->table);
     $this->db->join($this->akun_admin, 'b.id_akun_admin = a.id_akun_admin');
     $this->db->where('a.is_deleted', '0');
+    
+    $this->db->order_by('a.created_at', 'DESC');
 
     $i = 0;
 
@@ -114,6 +116,35 @@ class Data_berita_model extends CI_Model
     
     $this->db->insert('data_berita', $data);
     return $this->db->insert_id();
+  }
+
+  public function getDataBerita($id)
+  {
+    $this->db->select('
+      a.id_berita as id_berita,
+      a.prioritas as prioritas,
+      a.judul_berita as judul_berita,
+      a.sub_judul as sub_judul,
+      a.isi_berita as isi_berita,
+      a.foto as foto,
+      a.created_at as created_at,
+      a.updated_at as updated_at,
+      a.is_deleted as is_deleted,
+      b.username as username,
+      b.nama_lengkap as nama_lengkap
+    ');
+    $this->db->from($this->table);
+    $this->db->join($this->akun_admin, 'b.id_akun_admin = a.id_akun_admin');
+    $this->db->where('a.id_berita', $id);
+    $query = $this->db->get();
+    return $query->result();
+  }
+
+  public function update_berita($where, $data)
+  {
+    $this->db->set('updated_at', 'NOW()', FALSE);
+    $this->db->update('data_berita', $data, $where);
+    return $this->db->affected_rows();
   }
 
   
