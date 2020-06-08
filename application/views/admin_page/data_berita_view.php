@@ -20,8 +20,8 @@
         <table id="table" class="table table-striped table-bordered" cellspacing="0" width="100%">
           <thead class="bg-blue">
             <tr>
-              <th class="bg-blue-active" width="7%"><i class="fa fa-hashtag"></i></th>
-              <th width="20%">Berita</th>
+              <!-- <th class="bg-blue-active" width="7%"><i class="fa fa-hashtag"></i></th> -->
+              <th width="20%">Judul Berita</th>
               <th width="20%">Isi Berita</th>
 							<th width="23%">Cover Berita</th>
               <th width="20%">Informasi</th>
@@ -42,34 +42,11 @@
 
   $(document).ready(function() {
     getTable();
-
-    $('#btn_open_add').on('click', function(){
-      // $('#modal_form_add').modal('show');
-
-    });
-
 	});
 
   $(document).on('click', '.browse', function(){
     var file = $(this).parent().parent().parent().find('.file');
     file.trigger('click');
-  });
-  $(document).on('change', '.file', function(){
-    $(this).parent().find('#text_file').val($(this).val().replace(/C:\\fakepath\\/i, ''));
-    if($('input[name="img[]"]').val() !== ''){
-      $('#text_file').show();
-      $('#btn_batal_upload').show();
-      $('#show_img').attr('src','');
-    } else {
-      $('#text_file').hide();
-      $('#btn_batal_upload').hide();
-    }
-  });
-
-  $(document).on('click', '.re_input', function(){
-    $('input[name="img[]"]').val('');
-    $('#text_file').hide();
-    $('#btn_batal_upload').hide();
   });
 
 	function getTable() {
@@ -93,7 +70,7 @@
 			// Set column definition initialisation properties.
 			"columnDefs": [
 				{
-				"targets": [3, -1], //last column
+				"targets": [2, -1], //last column
 				"orderable": false, //set not orderable
 				},
 				{
@@ -114,130 +91,172 @@
 		  window.open("<?= base_url('berita/detail/') ?>"+id, '');
 	}
 
-  function tambah() {
-		
+  function pre_delete(id) {
+    $('#set_idBerita').val(id);
+    $('#pesan_waiting').text('Memuat Data');
+    $('#modal_form_waiting').modal('show');
+		$.ajax({
+			url: "<?php echo site_url('admin/berita/load_data_berita/') ?>" + id,
+			type: "POST",
+			dataType: "JSON",
+			success: function (data) {
+				var detail = data.dataForm;
+				setTimeout(function(){
+					if (data.status) {
+						$('#modal_form_waiting').modal('hide');
+            $('#modal_form_quest').modal('show');
+
+            $('#set_judul').text(detail.judul_berita);
+            $('#set_sub_judul').text(detail.sub_judul);
+            var htmlIsi = detail.isi_berita;
+            var strIsi = htmlIsi.replace(/<[^>]+>/g, '');
+            // $('#set_isi_berita').text(strIsi);
+            if(strIsi.length > 155)
+              $('#set_isi_berita').text(strIsi.substring(0,150) + '.....');
+
+						$('#set_author').text(detail.author);
+						$('#set_create_at').text(detail.create_date + ' | ' + detail.create_time + 'WIB');
+						$('#set_update_at').text(detail.update_date + ' | ' + detail.update_time + 'WIB');
+            
+						var url_img = detail.foto;
+						var set_img = window.location.origin+url_img.replace('.','');
+						$('#set_img').attr('src', set_img);
+					} else {
+						$('#header_msg_failed').html('<i class="fa fa-exclamation-triangle"></i> Tidak bisa membuka informasi data berita!');
+						$('#body_msg_failed').html(data.message);
+						$('#modal_form_failed').modal('show');
+					}
+				}, 100);
+				
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$('#header_msg_failed').html('<i class="fa fa-exclamation-triangle"></i> Tidak bisa membuka informasi data berita!');
+				$('#body_msg_failed').html('Mohon ulangi beberapa saat lagi');
+				$('#modal_form_failed').modal('show');
+				// window.open("<?= base_url('/admin/berita') ?>", '_self');
+			}
+		});
 	}
+
+  function get_delete() {
+    $('#modal_form_quest').modal('hide');
+    $('#pesan_waiting').text('Proses Hapus');
+    $('#modal_form_waiting').modal('show');
+    
+    var dataID = {
+      id_berita : $('#set_idBerita').val(),
+    };
+
+    $.ajax({
+      url: "<?php echo site_url('admin/berita/hapusberita') ?>",
+      data: dataID,
+      type: "POST",
+      dataType: "JSON",
+      success: function(data) {
+        setTimeout(function(){
+		  	  if (data.status) {
+            $('#modal_form_waiting').modal('hide');
+            $('.modal_action_status').html(data.message);
+            $('#modal_form_sukses').modal('show');
+            table.ajax.reload(null, false);
+          } else {
+            $('#modal_form_waiting').modal('hide');
+            $('.modal_action_status_failed').html(data.message);
+            $('#modal_form_failed').modal('show');
+            table.ajax.reload(null, false);
+          }
+        }, 1000);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        $('#modal_form_waiting').modal('hide');
+        $('.modal_action_status_failed').html('Hapus Berita Gagal<br><h4>Mohon ulangi beberapa saat lagi!</h4>');
+        $('#modal_form_failed').modal('show');
+        table.ajax.reload(null, false);
+      }
+    });
+  }
 
 </script>
 
-<!-- Modal Form Tambah Berita -->
-<div class="modal fade" id="modal_form_add" role="dialog">
-	<div class="modal-dialog modal-lg">
+<!-- Modal Question -->
+<div class="modal modal-warning fade" id="modal_form_quest" role="dialog">
+	<div class="modal-dialog">
 		<div class="modal-content">
-			<div class="modal-header bg-primary">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i
-							class="fa fa-times"></i></span></button>
-				<h4><i class="fas fa-edit"></i> Buat Berita</h4>
-			</div>
+      <div class="modal-header">
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times"></i></span> Batal</button>
+        <h4><i class="fa fa-trash"></i> Konfirmasi Hapus Berita</h4>
+		  </div>
 
-			<div class="modal-body">
-				<div class="from-body">
-					<input name="id_warga_" value="" class="form-control" type="hidden">
-					<div class="row">
-						<div class="col-md-6 col-sm-6">
-
-							<!-- Judul Berita -->
-							<div class="form-group">
-								<label>Judul Berita :</label>
-								<input name="judul" id="judul" placeholder="Masukkan judul berita..." class="form-control"
-									type="text">
-							</div>
-
-              <!-- Sub Judul -->
-							<div class="form-group">
-								<label>Judul Berita :</label>
-								<input name="sub_judul" id="sub_kudul" placeholder="Masukkan sub judul..." class="form-control"
-									type="text">
-							</div>
-							
-							<!-- Upload Gambar -->
-              <div class="form-group">
-                <label>Cover Berita :</label>
-                <div class="card-image-add">
-                  <input type="file" name="img[]" class="file">
-                  <div class="input-group col-xs-12">
-                    <!-- <span class="input-group-addon"><i class="fa fa-image"></i></span> -->
-                    <span class="input-group-btn">
-                      <button class="browse btn btn-primary btn-flat" type="button"><i class="fa fa-image"></i> Pilih Gambar</button>
-                    </span>
-                    <input type="text" class="form-control" id="text_file" disabled placeholder="Upload Gambar" style="display:none">
-                    <span class="input-group-btn" id="btn_batal_upload" style="display:none">
-                      <button class="re_input btn btn-defautl btn-flat text-red" title="Batal" type="button"><i class="fa fa-times"></i></button>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-						</div>
-
-						<div class="col-md-6 col-sm-6">
-							<!-- Kewarganegaraan -->
-							<div class="form-group">
-								<label>Kewarganegaraan :</label>
-								<select class="form-control select2min" style="width: 100%;" name="kewarganegaraan" id="kewarganegaraan"
-									placeholder="-- Kewarganegaraan --">
-									<option value="" disabled>-- Kewarganegaraan --</option>
-									<option value="indonesia">Indonesia (WNI)</option>
-									<option value="asing">Asing (WNA)</option>
-								</select>
-							</div>
-							<!-- Agama -->
-							<div class="form-group">
-								<label>Agama :</label>
-								<select class="form-control select2min" style="width: 100%;" name="agama" id="agama">
-									<option value="" disabled selected>-- Pilih Agama --</option>
-									<option value="islam">Islam</option>
-									<option value="kristen">Kristen</option>
-									<option value="katholik">Katholik</option>
-									<option value="hindu">Hindu</option>
-									<option value="budha">Budha</option>
-									<option value="khonghucu">Khonghucu</option>
-									<option value="lainnya">Lainnya</option>
-								</select>
-							</div>
-							<!-- Pendidikan -->
-							<div class="form-group">
-								<label>Pendidikan :</label>
-								<input name="pendidikan" id="pendidikan" placeholder="Pendidikan..." class="form-control" type="text">
-							</div>
-							<!-- Status Perkawinan -->
-							<div class="form-group">
-								<label>Status Perkawinan :</label>
-								<select class="form-control select2min" style="width: 100%;" name="status_perkawinan"
-									id="status_perkawinan">
-									<option value="" selected disabled>-- Pilih Status Perkawinan --</option>
-									<option value="belum_kawin">Belum Kawin</option>
-									<option value="kawin">Kawin</option>
-									<option value="cerai_hidup">Cerai Hidup</option>
-									<option value="cerai_mati">Cerai Mati</option>
-								</select>
-							</div>
-							<!-- Pekerjaan -->
-							<div class="form-group">
-								<label>Pekerjaan :</label>
-								<input name="pekerjaan" id="pekerjaan" placeholder="Pekerjaan..." class="form-control" type="text">
-							</div>
-							<!-- Golongan Darah -->
-							<div class="form-group">
-								<label>Golongan Darah :</label>
-								<select class="form-control select2min" style="width: 30%;" name="gol_darah" id="gol_darah">
-									<option value="" selected disabled>-- Pilih --</option>
-									<option value="A">A</option>
-									<option value="B">B</option>
-									<option value="AB">AB</option>
-									<option value="O">O</option>
-								</select>
-							</div>
-						</div>
+      <div class="modal-body">
+        <input name="set_idBerita" id="set_idBerita" type="hidden"/>
+        <h3 class="text-center text-bold">Apakah Anda ingin menghapus berita ini ? <a class="btn btn-danger" onclick="get_delete()"><b>Ya, Hapus </b><i class="fas fa-exclamation-triangle"></i></a></h3>
+        <div class="thumbnail">
+				  <div class="card-image">
+					  <img id="set_img" src="">
 					</div>
 
+					<div class="caption">
+						<h3 id="set_judul" class="box-title text-bold" style="line-height: 10px;">Judul Berita</h3>
+						<h4 id="set_sub_judul" class="box-title text-bold" style="line-height: 20px;">Sub Judul Berita</h4>
+            <p><div id="set_isi_berita">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor</div></p>
+            <hr class="style1">
+            <p>Penulis berita : <i class="fa fa-user"></i> <b id="set_author">Admin</b></p>
+            <p>Dibuat pada : <b id="set_created_at"> Senin, 08 Juni 2020 | 14:56 WIB</b></p>
+            <p>Diperbarui pada : <b id="set_updated_at"> Senin, 08 Juni 2020 | 14:56 WIB</b></p>
+					</div>
 				</div>
-			</div>
+        
+      </div>
 
-			<div class="modal-footer">
-				<a class="btn btn-primary" id="btn_simpan" onclick="prepare('edit_pribadi')"><i class="fas fa-save"></i> Simpan</a>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
+			<!-- <div class="modal-footer">
+				<button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Batal</button>
+			</div> -->
+		</div>
+	</div>
 </div>
-<!-- End Modal Edit Data Pribadi -->
+<!-- End Modal Question -->
+
+<!-- Modal Waiting -->
+<div class="modal" id="modal_form_waiting" role="dialog"  style="background-color: rgba(0,0,0,0.0); color: white; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+	<div class="modal-dialog modal-sm">
+				<div class="text-center">
+					<i class="fas fa-spinner fa-pulse fa-7x"></i>
+					<h4 id="pesan_waiting">Memuat...</h4>
+				</div>
+	</div>
+</div>
+<!-- End Modal Waiting -->
+
+<!-- Modal SUCCESS -->
+<div class="modal modal-success fade" id="modal_form_sukses" role="dialog">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header center">
+				<!-- <button type="button" data-dismiss="modal"></button> -->
+				<div class="text-center">
+					<i class="far fa-check-circle fa-10x"></i>
+					<h3 class="modal_action_status text-bold"></h3>
+					<button type="button" class="btn btn-outline" data-dismiss="modal">Oke</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End Modal SUCCESS -->
+
+<!-- Modal FAILED -->
+<div class="modal modal-danger fade" id="modal_form_failed" role="dialog">
+  <div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header center">
+        <div class="text-center">
+            <i class="fas fa-exclamation-triangle fa-10x"></i>
+            <h3 class="modal_action_status_failed text-bold"></h3>
+            <button type="button" class="btn btn-outline" data-dismiss="modal">Oke</button>
+        </div>
+      </div>
+		</div>
+	</div>
+</div>
+<!-- End Modal FAILED -->
