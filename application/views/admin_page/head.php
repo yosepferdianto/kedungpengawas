@@ -135,8 +135,44 @@
       padding: 5px;
     }
 
+    .card-image-add_ {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed #ddd;
+      padding: 5px;
+    }
+
+    .card-image-de {
+      width: 100%;
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-image-de > img {
+      width: 100%;
+      max-width: inherit;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%) scale(1.5);
+      -moz-transform: translate(-50%, -50%) scale(1.5);
+      -o-transform: translate(-50%, -50%) scale(1.5);
+      transform: translate(-50%, -50%) scale(1.5);
+    }
+
     .card-textarea {
       border: 1px solid #ddd;
+    }
+
+    .card-box {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      padding: 10px 10px 3px 10px;
     }
 
     hr.style1 {
